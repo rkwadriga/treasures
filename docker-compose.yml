@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
     mysql: # docker-compose exec -T mysql bash
-        image: mysql
+        image: mysql:9.1.0
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: root

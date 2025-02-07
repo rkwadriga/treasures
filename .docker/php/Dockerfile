@@ -3,7 +3,6 @@ FROM php:8.4-apache
 RUN pecl install xdebug \
     && apt-get -y update \
     && apt-get -y install libpq-dev \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install mysqli pdo pdo_mysql \
     && docker-php-ext-enable pdo_mysql \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
