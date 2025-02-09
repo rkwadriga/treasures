@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DragonTreasureRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
+#[ApiResource(description: 'A rare and valuable treasure')]
 class DragonTreasure
 {
     #[ORM\Id]
@@ -21,6 +24,7 @@ class DragonTreasure
     private ?string $description = null;
 
     #[ORM\Column]
+    #[ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
     private ?int $value = null;
 
     #[ORM\Column]
