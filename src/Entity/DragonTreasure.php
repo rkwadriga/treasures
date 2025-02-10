@@ -27,6 +27,7 @@ use function Symfony\Component\String\u;
         new Metadata\Patch(),
         new Metadata\Delete(),
     ],
+    formats: ['jsonld', 'json', 'csv' => 'text/csv'], // jsonld and json described in config\packages\api_platform.yaml, csv added
     normalizationContext: [
         'groups' => ['treasure:read'],
     ],
