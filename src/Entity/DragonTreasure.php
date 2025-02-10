@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
 #[Metadata\ApiResource(
@@ -21,6 +22,12 @@ use Doctrine\ORM\Mapping as ORM;
         new Metadata\Patch(),
         new Metadata\Delete(),
     ],
+    normalizationContext: [
+        'groups' => ['treasure:read'],
+    ],
+    denormalizationContext: [
+        'groups' => ['treasure:write'],
+    ],
 )]
 class DragonTreasure
 {
@@ -30,16 +37,20 @@ class DragonTreasure
     private ?int $id;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['treasure:read', 'treasure:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('treasure:read')]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Metadata\ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
+    #[Groups(['treasure:read', 'treasure:write'])]
     private ?int $value = null;
 
     #[ORM\Column]
+    #[Groups(['treasure:read', 'treasure:write'])]
     private ?int $coolFactor = null;
 
     #[ORM\Column]
@@ -76,6 +87,15 @@ class DragonTreasure
         return $this->description;
     }
 
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    #[Metadata\ApiProperty(description: 'Set multi-lined treasure description')]
+    #[Groups('treasure:write')]
     public function setTextDescription(string $description): static
     {
         $this->description = nl2br($description);
@@ -112,9 +132,15 @@ class DragonTreasure
         return $this->plunderedAt;
     }
 
-    /**
-     * A human-readable representation of when this treasure was plundered
-     */
+    public function setPlunderedAt(DateTimeImmutable $plunderedAt): static
+    {
+        $this->plunderedAt = $plunderedAt;
+
+        return $this;
+    }
+
+    #[Metadata\ApiProperty(description: 'A human-readable representation of when this treasure was plundered')]
+    #[Groups('treasure:read')]
     public function getPlunderedAtAgo(): string
     {
         return Carbon::instance($this->getPlunderedAt())->diffForHumans();

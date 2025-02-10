@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
     mysql: # docker-compose exec -T mysql bash
         image: mysql:9.1.0
@@ -23,8 +21,8 @@ services:
         environment:
             PHP_IDE_CONFIG: "serverName=Treasures_Docker"
         volumes:
-            - ./:/var/www/html/
-            - ./.docker/php/logs/:/var/log/apache2/
+            - ./:/var/www/html/:delegated
+            #- ./.docker/php/logs/:/var/log/apache2/
             - ./.docker/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
             - ./.docker/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
         extra_hosts:
