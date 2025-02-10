@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
 #[Metadata\ApiResource(
@@ -38,7 +39,7 @@ class DragonTreasure
 
     #[ORM\Column(length: 255)]
     #[Groups(['treasure:read', 'treasure:write'])]
-    private ?string $name = null;
+    private ?string $name;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups('treasure:read')]
@@ -59,10 +60,11 @@ class DragonTreasure
     #[ORM\Column]
     private bool $isPublished;
 
-    public function __construct()
+    public function __construct(?string $name = null)
     {
         $this->plunderedAt = new DateTimeImmutable();
         $this->isPublished = false;
+        $this->name = $name;
     }
 
     public function getId(): ?int
@@ -73,13 +75,6 @@ class DragonTreasure
     public function getName(): ?string
     {
         return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getDescription(): ?string
@@ -96,6 +91,7 @@ class DragonTreasure
 
     #[Metadata\ApiProperty(description: 'Set multi-lined treasure description')]
     #[Groups('treasure:write')]
+    #[SerializedName('description')]
     public function setTextDescription(string $description): static
     {
         $this->description = nl2br($description);
