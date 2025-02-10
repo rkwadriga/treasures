@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter as Filters;
 use ApiPlatform\Metadata;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\DragonTreasureRepository;
 use Carbon\Carbon;
 use DateTimeImmutable;
@@ -12,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use function Symfony\Component\String\u;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
 #[Metadata\ApiResource(
@@ -33,6 +35,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     ],
     paginationItemsPerPage: 10,
 )]
+#[Metadata\ApiFilter(PropertyFilter::class)] // Allows to get only selected fields
 class DragonTreasure
 {
     #[ORM\Id]
@@ -53,6 +56,7 @@ class DragonTreasure
     #[ORM\Column]
     #[Metadata\ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
     #[Groups(['treasure:read', 'treasure:write'])]
+    #[Metadata\ApiFilter(Filters\RangeFilter::class)]
     private ?int $value = null;
 
     #[ORM\Column]
@@ -93,6 +97,12 @@ class DragonTreasure
         $this->description = $description;
 
         return $this;
+    }
+
+    #[Groups('treasure:read')]
+    public function getShortDescription(): ?string
+    {
+        return u($this->description)->truncate(40, '...');
     }
 
     #[Metadata\ApiProperty(description: 'Set multi-lined treasure description')]
