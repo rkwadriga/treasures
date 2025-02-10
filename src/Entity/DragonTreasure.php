@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter as Filters;
 use ApiPlatform\Metadata;
 use App\Repository\DragonTreasureRepository;
 use Carbon\Carbon;
@@ -40,10 +42,12 @@ class DragonTreasure
 
     #[ORM\Column(length: 255)]
     #[Groups(['treasure:read', 'treasure:write'])]
+    #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     private ?string $name;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups('treasure:read')]
+    #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -59,6 +63,7 @@ class DragonTreasure
     private DateTimeImmutable $plunderedAt;
 
     #[ORM\Column]
+    #[Metadata\ApiFilter(Filters\BooleanFilter::class)]
     private bool $isPublished;
 
     public function __construct(?string $name = null)
