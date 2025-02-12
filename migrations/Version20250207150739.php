@@ -14,7 +14,7 @@ final class Version20250207150739 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'CREATE TABLE dragon_treasure';
     }
 
     public function up(Schema $schema): void

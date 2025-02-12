@@ -78,6 +78,12 @@ class DragonTreasure
     #[Metadata\ApiFilter(Filters\BooleanFilter::class)]
     private bool $isPublished;
 
+    #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['treasure:read', 'treasure:write'])]
+    #[Assert\NotBlank]
+    private ?User $owner = null;
+
     public function __construct(?string $name = null)
     {
         $this->plunderedAt = new DateTimeImmutable();
@@ -174,6 +180,18 @@ class DragonTreasure
     public function setIsPublished(bool $isPublished): static
     {
         $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

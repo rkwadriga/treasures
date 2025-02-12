@@ -14,7 +14,7 @@ final class Version20250209123216 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Rename dragon_treasure.created_at to dragon_treasure.plundered_at';
     }
 
     public function up(Schema $schema): void
