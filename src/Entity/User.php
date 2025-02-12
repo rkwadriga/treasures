@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,6 +17,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ApiResource(
+    operations: [
+        new Metadata\GetCollection(),
+        new Metadata\Get(
+            normalizationContext: [
+                'groups' => ['user:read', 'user:item:get'],
+            ],
+        ),
+        new Metadata\Post(),
+        new Metadata\Put(),
+        new Metadata\Patch(),
+        new Metadata\Delete(),
+    ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
 )]
@@ -47,7 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'treasure:item:get'])] // Group "treasure:item:get" needed to show this attribute only in "GET /treasures/<id>" request
     #[Assert\NotBlank]
     #[Assert\Email]
     private ?string $username = null;

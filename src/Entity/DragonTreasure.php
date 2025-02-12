@@ -22,7 +22,11 @@ use function Symfony\Component\String\u;
     description: 'A rare and valuable treasure',
     operations: [
         new Metadata\GetCollection(),
-        new Metadata\Get(),
+        new Metadata\Get(
+            normalizationContext: [
+                'groups' => ['treasure:read', 'treasure:item:get'],
+            ],
+        ),
         new Metadata\Post(),
         new Metadata\Put(),
         new Metadata\Patch(),
@@ -46,7 +50,7 @@ class DragonTreasure
     private ?int $id;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['treasure:read', 'treasure:write'])]
+    #[Groups(['treasure:read', 'treasure:write', 'user:item:get'])] // Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50, maxMessage: 'Describe your loot in 50 characters or less.')]
@@ -60,7 +64,7 @@ class DragonTreasure
 
     #[ORM\Column]
     #[Metadata\ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
-    #[Groups(['treasure:read', 'treasure:write'])]
+    #[Groups(['treasure:read', 'treasure:write', 'user:item:get'])]// Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request
     #[Metadata\ApiFilter(Filters\RangeFilter::class)]
     #[Assert\GreaterThanOrEqual(0)]
     private int $value = 0;
