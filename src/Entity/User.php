@@ -44,6 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank]
+    #[Assert\Email]
     private ?string $email = null;
 
     /**
@@ -60,16 +61,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['user:read', 'user:write', 'treasure:item:get'])] // Group "treasure:item:get" needed to show this attribute only in "GET /treasures/<id>" request
+    #[Groups(['user:read', 'user:write', 'treasure:item:get', 'treasure:write'])] // Group "treasure:item:get" needed to show this attribute only in "GET /treasures/<id>" request, "treasure:write" - for writing this attribute in "PATCH /treasures/<id>" request
     #[Assert\NotBlank]
-    #[Assert\Email]
     private ?string $username = null;
 
     /**
      * @var Collection<int, DragonTreasure>
      */
-    #[ORM\OneToMany(targetEntity: DragonTreasure::class, mappedBy: 'owner')]
-    #[Groups('user:read')]
+    #[ORM\OneToMany(targetEntity: DragonTreasure::class, mappedBy: 'owner', cascade: ['persist'])] // "cascade: ['persist']" means that you can create a new DragonTreasure on creating/updating the user
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /users/<id>" request
     private Collection $dragonTreasures;
 
     public function __construct()

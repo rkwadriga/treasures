@@ -50,7 +50,7 @@ class DragonTreasure
     private ?int $id;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['treasure:read', 'treasure:write', 'user:item:get'])] // Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request
+    #[Groups(['treasure:read', 'treasure:write', 'user:item:get', 'user:write'])] // Group "user:item:get" needed to show this attribute only in "GET /users/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50, maxMessage: 'Describe your loot in 50 characters or less.')]
@@ -64,7 +64,7 @@ class DragonTreasure
 
     #[ORM\Column]
     #[Metadata\ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
-    #[Groups(['treasure:read', 'treasure:write', 'user:item:get'])]// Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request
+    #[Groups(['treasure:read', 'treasure:write', 'user:item:get', 'user:write'])]// Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
     #[Metadata\ApiFilter(Filters\RangeFilter::class)]
     #[Assert\GreaterThanOrEqual(0)]
     private int $value = 0;
@@ -86,6 +86,7 @@ class DragonTreasure
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['treasure:read', 'treasure:write'])]
     #[Assert\NotBlank]
+    #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /treasures/<id>" request
     private ?User $owner = null;
 
     public function __construct(?string $name = null)
@@ -124,7 +125,7 @@ class DragonTreasure
     }
 
     #[Metadata\ApiProperty(description: 'Set multi-lined treasure description')]
-    #[Groups('treasure:write')]
+    #[Groups(['treasure:write', 'user:write'])] // Group "user:write" needed for writing this attribute in "PATCH /users/<id>" request
     #[SerializedName('description')]
     public function setTextDescription(string $description): static
     {
