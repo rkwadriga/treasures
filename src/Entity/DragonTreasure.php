@@ -41,7 +41,19 @@ use function Symfony\Component\String\u;
     ],
     paginationItemsPerPage: 10,
 )]
+#[Metadata\ApiResource( // Allows to select all treasures of specific user
+    uriTemplate: '/users/{user_id}/treasures.{_format}',
+    shortName: 'Treasure',
+    operations: [new Metadata\GetCollection()],
+    uriVariables: [
+        'user_id' => new Metadata\Link(fromProperty: 'dragonTreasures', fromClass: User::class, description: 'User identifier'),
+    ],
+    normalizationContext: [
+        'groups' => ['treasure:read'],
+    ],
+)]
 #[Metadata\ApiFilter(PropertyFilter::class)] // Allows to get only selected fields
+#[Metadata\ApiFilter(Filters\SearchFilter::class, properties: ['owner.username' => SearchFilterInterface::STRATEGY_PARTIAL])] // Allows to filter entities by owners (Like GET /treasures?owner.username=<part_of_username>)
 class DragonTreasure
 {
     #[ORM\Id]
@@ -50,7 +62,7 @@ class DragonTreasure
     private ?int $id;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['treasure:read', 'treasure:write', 'user:item:get', 'user:write'])] // Group "user:item:get" needed to show this attribute only in "GET /users/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
+    #[Groups(['treasure:read', 'treasure:write', 'user:read', 'user:write'])] // Group "user:item:get" needed to show this attribute only in "GET /users/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 50, maxMessage: 'Describe your loot in 50 characters or less.')]
@@ -64,7 +76,7 @@ class DragonTreasure
 
     #[ORM\Column]
     #[Metadata\ApiProperty(description: 'The estimated value of this treasure, in gold coins')]
-    #[Groups(['treasure:read', 'treasure:write', 'user:item:get', 'user:write'])]// Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
+    #[Groups(['treasure:read', 'treasure:write', 'user:read', 'user:write'])]// Group "user:item:get" needed to show this attribute only in "GET /user/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
     #[Metadata\ApiFilter(Filters\RangeFilter::class)]
     #[Assert\GreaterThanOrEqual(0)]
     private int $value = 0;
@@ -87,6 +99,7 @@ class DragonTreasure
     #[Groups(['treasure:read', 'treasure:write'])]
     #[Assert\NotBlank]
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /treasures/<id>" request
+    #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_EXACT)] // Allows to filter entities by owners (Like GET /treasures?owner=/api/users/<user_id>)
     private ?User $owner = null;
 
     public function __construct(?string $name = null)
