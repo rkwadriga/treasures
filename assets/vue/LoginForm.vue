@@ -83,13 +83,13 @@ const handleSubmit = async () => {
     if (!response.ok) {
         const data = await response.json();
         error.value = data.error;
-
         return;
     }
 
     email.value = '';
     password.value = '';
-    //emit('user-authenticated', userIri);
+    const userIri = response.headers.get('Location');
+    emit('user-authenticated', userIri);
 }
 
 </script>
