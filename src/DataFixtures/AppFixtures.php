@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Factory\ApiTokenFactory;
 use App\Factory\DragonTreasureFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -15,9 +16,14 @@ class AppFixtures extends Fixture
             'email' => 'bernie@dragonmail.com',
             'password' => 'roar',
         ]);
-        UserFactory::createMany(10);
-        DragonTreasureFactory::createMany(40, fn() => [
+        UserFactory::createMany(9);
+
+        DragonTreasureFactory::createMany(50, fn() => [
             'owner' => UserFactory::random(),
+        ]);
+
+        ApiTokenFactory::createMany(30, fn() => [
+            'ownedBy' => UserFactory::random(),
         ]);
     }
 }

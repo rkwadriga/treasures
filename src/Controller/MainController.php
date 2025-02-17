@@ -18,6 +18,7 @@ class MainController extends AbstractController
             'userData' => $normalizer->normalize($user, 'jsonld', [
                 'groups' => ['user:read'],
             ]),
+            'tokensData' => $user?->getValidTokenStrings(),
         ]);
     }
 }
