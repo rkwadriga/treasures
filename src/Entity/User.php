@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\UserRepository;
@@ -17,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ApiResource(
+#[Metadata\ApiResource(
     operations: [
         new Metadata\GetCollection(),
         new Metadata\Get(
@@ -25,13 +24,14 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'groups' => ['user:read', 'user:item:get'],
             ],
         ),
-        new Metadata\Post(),
-        new Metadata\Put(),
-        new Metadata\Patch(),
-        new Metadata\Delete(),
+        new Metadata\Post(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Metadata\Put(security: 'is_granted("ROLE_USER_EDIT")'),
+        new Metadata\Patch(security: 'is_granted("ROLE_USER_EDIT")'),
+        new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
+    security: 'is_granted("ROLE_USER")',
 )]
 #[Metadata\ApiResource( // Allows to select owner of specific treasure
     uriTemplate: '/treasures/{treasure_id}/owner.{_format}',
@@ -42,6 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: [
         'groups' => ['user:read'],
     ],
+    security: 'is_granted("ROLE_USER")',
 )]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]

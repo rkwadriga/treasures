@@ -27,10 +27,10 @@ use function Symfony\Component\String\u;
                 'groups' => ['treasure:read', 'treasure:item:get'],
             ],
         ),
-        new Metadata\Post(),
-        new Metadata\Put(),
-        new Metadata\Patch(),
-        new Metadata\Delete(),
+        new Metadata\Post(security: 'is_granted("ROLE_TREASURE_CREATE")'),
+        new Metadata\Put(security: 'is_granted("ROLE_TREASURE_EDIT")'),
+        new Metadata\Patch(security: 'is_granted("ROLE_TREASURE_EDIT")'),
+        new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
     ],
     formats: ['jsonld', 'json', 'csv' => 'text/csv'], // jsonld and json described in config\packages\api_platform.yaml, csv added
     normalizationContext: [
