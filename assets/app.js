@@ -1,6 +1,10 @@
-// assets/app.js
 import { registerReactControllerComponents } from '@symfony/ux-react';
-import './styles/app.css';
-import './bootstrap';
+import { registerVueControllerComponents } from '@symfony/ux-vue';
 
-registerReactControllerComponents(require.context('./react/controllers', true, /\.([jt])sx?$/));
+// any CSS you import will output into a single css file (app.css in this case)
+import './styles/app.css';
+
+// start the Stimulus application
+import './bootstrap';
+registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
+registerVueControllerComponents(require.context('./vue/controllers', true, /\.vue$/));

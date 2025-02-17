@@ -8,3 +8,8 @@ api_platform:
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
+
+    # DIsavle the "api_doc" route
+    #enable_docs: false
+    # Disable the documentation
+    #enable_entrypoint: false

@@ -16,6 +16,11 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            # Activate the security listener for route "app_login"
+            json_login:
+                check_path: app_login
+                username_path: email
+                password_path: password
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
