@@ -26,6 +26,9 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
             throw new CustomUserMessageAuthenticationException('Token expired');
         }
 
+        // Set user's roles to be defined by token's scopes
+        $token->getOwnedBy()->markAsTokenAuthenticated($token->getScopes());
+
         return new UserBadge($token->getOwnedBy()->getUserIdentifier());
     }
 }
