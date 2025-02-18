@@ -1,0 +1,10 @@
+{
+    "patches": {
+        "ApiPlatform/Hydra": {
+            "Remove the AdvancedNameConverterInterface implementation from ApiPlatform\\Hydra\\Serializer\\HydraPrefixNameConverter": "patches/ApiPlatform/Hydra/HydraPrefixNameConverter-implementation.patch"
+        },
+        "Doctrine/Orm": {
+            "Use object property access instead of array access on ApiPlatform\\Doctrine\\Orm\\Extension\\EagerLoadingExtension": "patches/Doctrine/Orm/EagerLoadingExtension-object-property-access.patch"
+        }
+    }
+}

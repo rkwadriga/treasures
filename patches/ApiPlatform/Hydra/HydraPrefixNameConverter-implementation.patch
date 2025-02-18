@@ -1,0 +1,17 @@
+Index: vendor/api-platform/hydra/Serializer/HydraPrefixNameConverter.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/vendor/api-platform/hydra/Serializer/HydraPrefixNameConverter.php b/vendor/api-platform/hydra/Serializer/HydraPrefixNameConverter.php
+--- a/vendor/api-platform/hydra/Serializer/HydraPrefixNameConverter.php	
++++ b/vendor/api-platform/hydra/Serializer/HydraPrefixNameConverter.php	(date 1739836787630)
+@@ -17,7 +17,7 @@
+ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+ 
+-final readonly class HydraPrefixNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
++final readonly class HydraPrefixNameConverter implements NameConverterInterface
+ {
+     /**
+      * @param array<string,mixed> $defaultContext
