@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Metadata\Post(
             security: 'is_granted("PUBLIC_ACCESS")',
-            validationContext: ['groups' => ['Default', 'postValidation']]
+            validationContext: ['groups' => ['Default', 'postValidation']] // This needed to validate the plainPassword property only on "POST /api/users" request
         ),
         new Metadata\Put(security: 'is_granted("ROLE_USER_EDIT")'),
         new Metadata\Patch(security: 'is_granted("ROLE_USER_EDIT")'),
@@ -101,7 +101,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups('user:write')]
     #[SerializedName('password')]
-    #[Assert\NotBlank(groups: ['postValidation'])]
+    #[Assert\NotBlank(groups: ['postValidation'])] // This needed to run validation only on "POST /api/users" request
     #[Assert\Length(min: 4, max: 255, maxMessage: 'The password should be between 4 and 255 characters.')]
     private ?string $plainPassword = null; // See the App\State\UserHashPasswordProcessor
 
