@@ -2,31 +2,35 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\ApiToken;
+use App\Factory\ApiTokenFactory;
 use App\Factory\DragonTreasureFactory;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Browser\Test\HasBrowser;
+use App\Factory\UserFactory;
+use Symfony\Component\HttpFoundation\Response;
+use Zenstruck\Browser\HttpOptions;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Test\Factories;
 
 /**
  * Run tests: ./bin/phpunit tests/Functional/DragonTreasureResourceTest.php
  */
-class DragonTreasureResourceTest extends KernelTestCase
+class DragonTreasureResourceTest extends ApiTestCase
 {
-    use HasBrowser;
     use ResetDatabase;
     use Factories;
 
     private string $baseUrl = '/api';
 
-
-    public function testGetCollectionOfTreasures()
+    /**
+     * Run test: ./bin/phpunit --filter=testGetCollectionOfTreasures
+     */
+    public function testGetCollectionOfTreasures(): void
     {
         DragonTreasureFactory::createMany(5);
 
         $json = $this->browser()
             ->get("{$this->baseUrl}/treasures")
-            ->assertStatus(200)
+            ->assertStatus(Response::HTTP_OK)
             ->assertJson()
             ->json()
         ;
@@ -44,5 +48,71 @@ class DragonTreasureResourceTest extends KernelTestCase
             'shortDescription',
             'plunderedAtAgo',
         ]);
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testPostToCreateTreasure
+     */
+    public function testPostToCreateTreasure(): void
+    {
+        $user = UserFactory::createOne();
+
+        $this->browser()
+            ->actingAs($user)
+            ->post("{$this->baseUrl}/treasures", [
+                'json' => [],
+            ])
+            ->assertStatus(422)
+            ->post("{$this->baseUrl}/treasures", HttpOptions::json([
+                'name' => 'A shiny thing',
+                'description' => 'It sparkles when I wave it in the air.',
+                'value' => 1000,
+                'coolFactor' => 5,
+                'owner' => "{$this->baseUrl}/users/{$user->getId()}",
+            ]))
+            ->assertStatus(Response::HTTP_CREATED)
+            ->assertJson()
+            ->assertJsonMatches('name', 'A shiny thing')
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testPostToCreateTreasureWithApiToken
+     */
+    public function testPostToCreateTreasureWithApiToken(): void
+    {
+        $token = ApiTokenFactory::createOneWithExpiresAfter('1 hour', ['scopes' => [
+            ApiToken::SCOPE_TREASURE_CREATE,
+        ]]);
+
+        $this->browser()
+            ->post("{$this->baseUrl}/treasures", [
+                'json' => [],
+                'headers' => [
+                    'Authorization' => "Bearer {$token->getToken()}",
+                ]
+            ])
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testPostToCreateTreasureDeniedWithoutScope
+     */
+    public function testPostToCreateTreasureDeniedWithoutScope(): void
+    {
+        $token = ApiTokenFactory::createOneWithExpiresAfter('1 hour', ['scopes' => [
+            ApiToken::SCOPE_TREASURE_EDIT,
+        ]]);
+
+        $this->browser()
+            ->post("{$this->baseUrl}/treasures", [
+                'json' => [],
+                'headers' => [
+                    'Authorization' => "Bearer {$token->getToken()}",
+                ]
+            ])
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
     }
 }
