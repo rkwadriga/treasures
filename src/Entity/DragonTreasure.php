@@ -98,8 +98,9 @@ class DragonTreasure
 
     #[ORM\Column]
     #[Metadata\ApiFilter(Filters\BooleanFilter::class)]
-    #[Groups(['treasure:read', 'treasure:write'])]
-    #[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')] // See the App\Security\Voter\DragonTreasureVoter
+    // #[Groups(['treasure:read', 'treasure:write'])]
+    //#[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')] // See the App\Security\Voter\DragonTreasureVoter
+    #[Groups(['admin:read', 'admin:write'])] // See the App\ApiPlatform\AminGroupsContextBuilder (it adds the "admin:read" group on serializing and "admin:write" group on deserializing)
     private bool $isPublished;
 
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]
