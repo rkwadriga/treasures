@@ -25,7 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'groups' => ['user:read', 'user:item:get'],
             ],
         ),
-        new Metadata\Post(security: 'is_granted("PUBLIC_ACCESS")'),
+        new Metadata\Post(
+            security: 'is_granted("PUBLIC_ACCESS")',
+            validationContext: ['groups' => ['Default', 'postValidation']],
+        ),
         new Metadata\Put(security: 'is_granted("ROLE_USER_EDIT")'),
         new Metadata\Patch(security: 'is_granted("ROLE_USER_EDIT")'),
         new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
@@ -95,9 +98,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** Scopes given during API authentication */
     private ?array $accessTokenScopes = null;
 
+
     #[Groups('user:write')]
-    #[SerializedName('password')] // See the App\State\UserHashPasswordProcessor
-    private ?string $plainPassword = null;
+    #[SerializedName('password')]
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    #[Assert\Length(min: 4, max: 255, maxMessage: 'The password should be between 4 and 255 characters.')]
+    private ?string $plainPassword = null; // See the App\State\UserHashPasswordProcessor
 
     public function __construct()
     {

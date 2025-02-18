@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -35,6 +36,29 @@ class UserResourceTest extends ApiTestCase
                 ]
             ])
             ->assertSuccessful()
+        ;
+    }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testPatchToUpdateUser
+     */
+    public function testPatchToUpdateUser(): void
+    {
+        $user = UserFactory::createOne();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/users/{$user->getId()}", [
+                'json' => [
+                    'username' => 'changed_username',
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                ]
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('username', 'changed_username')
         ;
     }
 }
