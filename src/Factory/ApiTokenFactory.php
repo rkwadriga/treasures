@@ -29,7 +29,7 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
     {
         if (is_string($expiresAt)) {
             $expiresAt = new DateTimeImmutable($expiresAt);
-        } elseif (!($expiresAt instanceof DateTimeImmutable)) {
+        } elseif (!$expiresAt instanceof DateTimeImmutable) {
             $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
         }
 
