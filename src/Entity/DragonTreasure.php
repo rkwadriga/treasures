@@ -33,8 +33,8 @@ use function Symfony\Component\String\u;
             securityPostDenormalize: 'is_granted("ROLE_ADMIN") or object.getOwner() == user'
         ),
         new Metadata\Patch(
-            security: 'is_granted("EDIT", object)',
-            securityPostDenormalize: 'is_granted("EDIT", object)'
+            security: 'is_granted("EDIT", object)', // See the App\Entity\ApiToken\DragonTreasureVoter
+            securityPostDenormalize: 'is_granted("EDIT", object)' // See the App\Entity\ApiToken\DragonTreasureVoter
         ),
         new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
     ],
@@ -71,7 +71,7 @@ class DragonTreasure
     #[Groups(['treasure:read', 'treasure:write', 'user:read', 'user:write'])] // Group "user:item:get" needed to show this attribute only in "GET /users/<id>" request, "user:write" - for writing this attribute in "PATCH /users/<id>" request
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_PARTIAL)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 2, max: 50, maxMessage: 'Describe your loot in 50 characters or less.')]
+    #[Assert\Length(min: 2, max: 255, maxMessage: 'Describe your loot in 255 characters or less.')]
     private ?string $name;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -98,6 +98,8 @@ class DragonTreasure
 
     #[ORM\Column]
     #[Metadata\ApiFilter(Filters\BooleanFilter::class)]
+    #[Groups(['treasure:read', 'treasure:write'])]
+    #[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')]
     private bool $isPublished;
 
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]

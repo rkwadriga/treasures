@@ -166,7 +166,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     public function testAdminCanPatchToUpdateTreasure(): void
     {
         $admin = UserFactory::new()->asAdmin()->create();
-        $treasure = DragonTreasureFactory::new()->withValue(111111)->create();
+        $treasure = DragonTreasureFactory::new()->withValue(111111)->withIsPublished(false)->create();
 
         $this->browser()
             ->actingAs($admin)
@@ -178,6 +178,29 @@ class DragonTreasureResourceTest extends ApiTestCase
             ->assertStatus(Response::HTTP_OK)
             ->assertJson()
             ->assertJsonMatches('value', 12345678)
+            ->assertJsonMatches('isPublished', false)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testOwnerCanSeeIsPublishedField
+     */
+    public function testOwnerCanSeeIsPublishedField(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->withIsPublished(false)->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 12345678,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('value', 12345678)
+            ->assertJsonMatches('isPublished', false)
         ;
     }
 }

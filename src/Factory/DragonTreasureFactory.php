@@ -24,6 +24,11 @@ final class DragonTreasureFactory extends PersistentProxyObjectFactory
         return $this->with(['owner' => $owner]);
     }
 
+    public function withIsPublished(bool $isPublished): DragonTreasureFactory
+    {
+        return $this->with(['isPublished' => $isPublished]);
+    }
+
     public static function class(): string
     {
         return DragonTreasure::class;
@@ -31,11 +36,13 @@ final class DragonTreasureFactory extends PersistentProxyObjectFactory
 
     protected function defaults(): array|callable
     {
+        $name = self::faker()->randomElement(self::TREASURE_NAMES);
+
         return [
             'coolFactor' => self::faker()->numberBetween(1, 10),
             'description' => self::faker()->paragraph(),
             'isPublished' => self::faker()->boolean(),
-            'name' => self::faker()->randomElement(self::TREASURE_NAMES),
+            'name' => $name,
             'plunderedAt' => DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-1 year')),
             'value' => self::faker()->numberBetween(1000, 1000000),
             'owner' => UserFactory::new(),
