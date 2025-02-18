@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Metadata\Post(
             security: 'is_granted("PUBLIC_ACCESS")',
-            validationContext: ['groups' => ['Default', 'postValidation']],
+            validationContext: ['groups' => ['Default', 'postValidation']]
         ),
         new Metadata\Put(security: 'is_granted("ROLE_USER_EDIT")'),
         new Metadata\Patch(security: 'is_granted("ROLE_USER_EDIT")'),
