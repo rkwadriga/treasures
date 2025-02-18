@@ -154,7 +154,7 @@ class DragonTreasureResourceTest extends ApiTestCase
                     'owner' => "{$this->baseUrl}/users/{$user2->getId()}",
                 ],
             ])
-            ->assertStatus(Response::HTTP_FORBIDDEN)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
         ;
     }
 

@@ -29,6 +29,7 @@ final class DragonTreasureVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
+
         assert($subject instanceof DragonTreasure);
 
         if (!$this->security->isGranted(ApiToken::SCOPE_TREASURE_EDIT)) {

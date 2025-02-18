@@ -7,6 +7,7 @@ use ApiPlatform\Doctrine\Orm\Filter as Filters;
 use ApiPlatform\Metadata;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\DragonTreasureRepository;
+use App\Validator\IsValidOwner;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
@@ -33,8 +34,8 @@ use function Symfony\Component\String\u;
             securityPostDenormalize: 'is_granted("ROLE_ADMIN") or object.getOwner() == user'
         ),
         new Metadata\Patch(
-            security: 'is_granted("EDIT", object)', // See the App\Entity\ApiToken\DragonTreasureVoter
-            securityPostDenormalize: 'is_granted("EDIT", object)' // See the App\Entity\ApiToken\DragonTreasureVoter
+            security: 'is_granted("EDIT", object)' // See the App\Security\Voter\DragonTreasureVoter
+            //securityPostDenormalize: 'is_granted("EDIT", object)' // See the App\Security\Voter\DragonTreasureVoter
         ),
         new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
     ],
@@ -110,6 +111,7 @@ class DragonTreasure
     #[Groups(['treasure:read', 'treasure:write'])]
     #[Assert\NotBlank]
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /treasures/<id>" request
+    #[IsValidOwner]
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_EXACT)] // Allows to filter entities by owners (Like GET /treasures?owner=/api/users/<user_id>)
     private ?User $owner = null;
 
