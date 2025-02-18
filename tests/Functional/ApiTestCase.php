@@ -13,6 +13,8 @@ abstract class ApiTestCase extends KernelTestCase
         browser as baseKernelBrowser;
     }
 
+    protected string $baseUrl = '/api';
+
     protected function browser(array $options = [], array $server = []): KernelBrowser
     {
         return $this->baseKernelBrowser($options, $server)

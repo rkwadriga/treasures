@@ -99,7 +99,7 @@ class DragonTreasure
     #[ORM\Column]
     #[Metadata\ApiFilter(Filters\BooleanFilter::class)]
     #[Groups(['treasure:read', 'treasure:write'])]
-    #[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')]
+    #[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')] // See the App\Security\Voter\DragonTreasureVoter
     private bool $isPublished;
 
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]

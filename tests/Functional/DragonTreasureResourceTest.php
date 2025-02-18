@@ -19,8 +19,6 @@ class DragonTreasureResourceTest extends ApiTestCase
     use ResetDatabase;
     use Factories;
 
-    private string $baseUrl = '/api';
-
     /**
      * Run test: ./bin/phpunit --filter=testGetCollectionOfTreasures
      */
