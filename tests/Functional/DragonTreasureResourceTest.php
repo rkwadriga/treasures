@@ -81,9 +81,7 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureWithApiToken(): void
     {
-        $token = ApiTokenFactory::createOneWithExpiresAfter('1 hour', ['scopes' => [
-            ApiToken::SCOPE_TREASURE_CREATE,
-        ]]);
+        $token = ApiTokenFactory::createOneWithExpiresAfterAndScopes('1 hour', [ApiToken::SCOPE_TREASURE_CREATE]);
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [
@@ -101,9 +99,7 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureDeniedWithoutScope(): void
     {
-        $token = ApiTokenFactory::createOneWithExpiresAfter('1 hour', ['scopes' => [
-            ApiToken::SCOPE_TREASURE_EDIT,
-        ]]);
+        $token = ApiTokenFactory::createOneWithExpiresAfterAndScopes('1 hour', [ApiToken::SCOPE_TREASURE_EDIT]);
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [

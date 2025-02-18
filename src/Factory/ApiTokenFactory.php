@@ -27,6 +27,16 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
         ], $attributes));
     }
 
+    public static function createOneWithScopes(array $scopes, array $attributes = []): ApiToken
+    {
+        return self::createOne(array_merge(['scopes' => $scopes], $attributes));
+    }
+
+    public static function createOneWithExpiresAfterAndScopes(string $interval, array $scopes, array $attributes = []): ApiToken
+    {
+        return self::createOneWithExpiresAfter($interval, array_merge(['scopes' => $scopes], $attributes));
+    }
+
     protected function defaults(): array|callable
     {
         $monthsCount = self::faker()->numberBetween(0, 12);
