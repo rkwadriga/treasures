@@ -18,23 +18,27 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
         return ApiToken::class;
     }
 
-    public static function createOneWithExpiresAfter(string $interval, array $attributes = []): ApiToken
+    public function withExpiresAfter(string $interval, array $attributes = []): ApiTokenFactory
     {
         $date = new DateTime();
         $date->add(DateInterval::createFromDateString("+{$interval}"));
-        return self::createOne(array_merge([
-            'expiresAt' => DateTimeImmutable::createFromMutable($date),
-        ], $attributes));
+        return $this->withExpiresAt($date);
     }
 
-    public static function createOneWithScopes(array $scopes, array $attributes = []): ApiToken
+    public function withExpiresAt(DateTimeImmutable|DateTime|string $expiresAt): ApiTokenFactory
     {
-        return self::createOne(array_merge(['scopes' => $scopes], $attributes));
+        if (is_string($expiresAt)) {
+            $expiresAt = new DateTimeImmutable($expiresAt);
+        } elseif (!($expiresAt instanceof DateTimeImmutable)) {
+            $expiresAt = DateTimeImmutable::createFromMutable($expiresAt);
+        }
+
+        return $this->with(['expiresAt' => $expiresAt]);
     }
 
-    public static function createOneWithExpiresAfterAndScopes(string $interval, array $scopes, array $attributes = []): ApiToken
+    public function withScopes(array $scopes, array $attributes = []): ApiTokenFactory
     {
-        return self::createOneWithExpiresAfter($interval, array_merge(['scopes' => $scopes], $attributes));
+        return $this->with(['scopes' => $scopes]);
     }
 
     protected function defaults(): array|callable

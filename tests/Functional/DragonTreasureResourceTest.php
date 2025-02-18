@@ -81,7 +81,10 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureWithApiToken(): void
     {
-        $token = ApiTokenFactory::createOneWithExpiresAfterAndScopes('1 hour', [ApiToken::SCOPE_TREASURE_CREATE]);
+        $token = ApiTokenFactory::new()
+            ->withExpiresAfter('1 hour')
+            ->withScopes([ApiToken::SCOPE_TREASURE_CREATE])
+            ->create();
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [
@@ -99,7 +102,10 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureDeniedWithoutScope(): void
     {
-        $token = ApiTokenFactory::createOneWithExpiresAfterAndScopes('1 hour', [ApiToken::SCOPE_TREASURE_EDIT]);
+        $token = ApiTokenFactory::new()
+            ->withExpiresAfter('1 hour')
+            ->withScopes([ApiToken::SCOPE_TREASURE_EDIT])
+            ->create();
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [
@@ -109,6 +115,69 @@ class DragonTreasureResourceTest extends ApiTestCase
                 ]
             ])
             ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testPatchToUpdateTreasure
+     */
+    public function testPatchToUpdateTreasure(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withValue(111111)->withOwner($user)->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 1234578,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('value', 1234578)
+        ;
+
+        $user2 = UserFactory::createOne();
+        $this->browser()
+            ->actingAs($user2)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 8765421,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'owner' => "{$this->baseUrl}/users/{$user2->getId()}",
+                ],
+            ])
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testAdminCanPatchToUpdateTreasure
+     */
+    public function testAdminCanPatchToUpdateTreasure(): void
+    {
+        $admin = UserFactory::new()->asAdmin()->create();
+        $treasure = DragonTreasureFactory::new()->withValue(111111)->create();
+
+        $this->browser()
+            ->actingAs($admin)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 12345678,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('value', 12345678)
         ;
     }
 }

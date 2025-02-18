@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\DragonTreasure;
+use App\Entity\User;
 use DateTimeImmutable;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
@@ -12,6 +13,16 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 final class DragonTreasureFactory extends PersistentProxyObjectFactory
 {
     private const array TREASURE_NAMES = ['pile of gold coins', 'diamond-encrusted throne', 'rare magic staff', 'enchanted sword', 'set of intricately crafted goblets', 'collection of ancient tomes', 'hoard of shiny gemstones', 'chest filled with priceless works of art', 'giant pearl', 'crown made of pure platinum', 'giant egg (possibly a dragon egg?)', 'set of ornate armor', 'set of golden utensils', 'statue carved from a single block of marble', 'collection of rare, antique weapons', 'box of rare, exotic chocolates', 'set of ornate jewelry', 'set of rare, antique books', 'giant ball of yarn', 'life-sized statue of the dragon itself', 'collection of old, used toothbrushes', 'box of mismatched socks', 'set of outdated electronics (such as CRT TVs or floppy disks)', 'giant jar of pickles', 'collection of novelty mugs with silly sayings', 'pile of old board games', 'giant slinky', 'collection of rare, exotic hats'];
+
+    public function withValue(int $value): DragonTreasureFactory
+    {
+        return $this->with(['value' => $value]);
+    }
+
+    public function withOwner(User $owner): DragonTreasureFactory
+    {
+        return $this->with(['owner' => $owner]);
+    }
 
     public static function class(): string
     {

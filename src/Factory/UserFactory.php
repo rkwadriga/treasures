@@ -22,9 +22,19 @@ final class UserFactory extends PersistentProxyObjectFactory
     ];
 
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct();
+    }
+
+    public function withRoles(array $roles): UserFactory
+    {
+        return $this->with(['roles' => $roles]);
+    }
+
+    public function asAdmin(): UserFactory
+    {
+        return $this->withRoles(['ROLE_ADMIN']);
     }
 
     public static function class(): string
@@ -41,9 +51,6 @@ final class UserFactory extends PersistentProxyObjectFactory
         ];
     }
 
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
-     */
     protected function initialize(): static
     {
         return $this->afterInstantiate(function(User $user): void {
