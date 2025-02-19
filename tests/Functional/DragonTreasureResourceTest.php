@@ -3,9 +3,9 @@
 namespace App\Tests\Functional;
 
 use App\Entity\ApiToken;
+use App\Entity\Notification;
 use App\Factory\ApiTokenFactory;
 use App\Factory\DragonTreasureFactory;
-use App\Factory\NotificationFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\HttpOptions;
@@ -427,6 +427,9 @@ class DragonTreasureResourceTest extends ApiTestCase
             ->assertJsonMatches('isPublished', true)
         ;
 
-        NotificationFactory::repository()->assert()->count(1);
+        self::bootKernel();
+        $entityManager = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $notificationRepository = $entityManager->getRepository(Notification::class);
+        $this->assertEquals(1, $notificationRepository->count());
     }
 }
