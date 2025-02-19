@@ -41,6 +41,13 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
         return $this->with(['scopes' => $scopes]);
     }
 
+    public function asExpired(string $interval = '1 hour'): ApiTokenFactory
+    {
+        $date = new DateTime();
+        $date->add(DateInterval::createFromDateString("-{$interval}"));
+        return $this->withExpiresAt($date);
+    }
+
     protected function defaults(): array|callable
     {
         $monthsCount = self::faker()->numberBetween(0, 12);

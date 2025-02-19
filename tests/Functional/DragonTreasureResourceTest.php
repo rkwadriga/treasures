@@ -303,4 +303,22 @@ class DragonTreasureResourceTest extends ApiTestCase
             ->assertJsonMatches('isPublished', true)
         ;
     }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testImpossibleGetTreasuresCollectionWithExpiredToken
+     */
+    public function testImpossibleGetTreasuresCollectionWithExpiredToken(): void
+    {
+        $token = ApiTokenFactory::new()->asExpired()->create();
+        DragonTreasureFactory::new()->withIsPublished(true)->create();
+
+        $this->browser()
+            ->get("{$this->baseUrl}/treasures", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token->getToken(),
+                ],
+            ])
+            ->assertStatus(Response::HTTP_UNAUTHORIZED)
+        ;
+    }
 }
