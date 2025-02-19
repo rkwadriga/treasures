@@ -343,6 +343,28 @@ class DragonTreasureResourceTest extends ApiTestCase
     }
 
     /**
+     * Run test: ./bin/phpunit --filter=testOwnerCanSeeIsPublishedAndIsMineFields
+     */
+    public function testOwnerCanSeeIsPublishedAndIsMineFields(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->asPublished()->withValue(12345)->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 54321,
+                ],
+            ])
+            ->assertStatus(200)
+            ->assertJsonMatches('value', 54321)
+            ->assertJsonMatches('isPublished', true)
+            ->assertJsonMatches('isMine', true)
+        ;
+    }
+
+    /**
      * Run test: ./bin/phpunit --filter=testOwnerCanSeeIsPublishedField
      */
     public function testOwnerCanSeeIsPublishedField(): void

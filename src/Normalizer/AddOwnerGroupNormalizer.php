@@ -25,7 +25,13 @@ readonly class AddOwnerGroupNormalizer implements NormalizerInterface, Serialize
             $context['groups'][] = 'owner:read';
         }
 
-        return $this->innerNormalizer->normalize($data, $format, $context);
+        $normalized = $this->innerNormalizer->normalize($data, $format, $context);
+
+        if ($data instanceof DragonTreasure && $this->security->getUser() === $data->getOwner()) {
+            $normalized['isMine'] = true;
+        }
+
+        return $normalized;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
