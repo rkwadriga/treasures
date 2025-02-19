@@ -427,9 +427,7 @@ class DragonTreasureResourceTest extends ApiTestCase
             ->assertJsonMatches('isPublished', true)
         ;
 
-        self::bootKernel();
-        $entityManager = self::$kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $notificationRepository = $entityManager->getRepository(Notification::class);
+        $notificationRepository = $this->getRepository(Notification::class);
         $this->assertEquals(1, $notificationRepository->count());
     }
 }
