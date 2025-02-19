@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Factory\DragonTreasureFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Foundry\Test\Factories;
@@ -59,6 +60,59 @@ class UserResourceTest extends ApiTestCase
             ->assertStatus(Response::HTTP_OK)
             ->assertJson()
             ->assertJsonMatches('username', 'changed_username')
+        ;
+    }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testTreasureCanNotBeStolen
+     */
+    public function testTreasureCanNotBeStolen(): void
+    {
+        $user = UserFactory::createOne();
+        $otherUser = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/users/{$user->getId()}", [
+                'json' => [
+                    'username' => 'changed_username',
+                    'dragonTreasures' => [
+                        "{$this->baseUrl}/treasures/{$treasure->getId()}"
+                    ],
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                ]
+            ])
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ;
+    }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testAdminCanChangeTreasureOwner
+     */
+    public function testAdminCanChangeTreasureOwner(): void
+    {
+        $admin = UserFactory::new()->asAdmin()->create();
+        $user = UserFactory::createOne();
+        $otherUser = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->create();
+
+        $this->browser()
+            ->actingAs($admin)
+            ->patch("{$this->baseUrl}/users/{$user->getId()}", [
+                'json' => [
+                    'username' => 'changed_username',
+                    'dragonTreasures' => [
+                        "{$this->baseUrl}/treasures/{$treasure->getId()}"
+                    ],
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/merge-patch+json',
+                ]
+            ])
+            ->assertStatus(Response::HTTP_OK)
         ;
     }
 }

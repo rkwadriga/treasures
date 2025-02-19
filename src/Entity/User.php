@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\UserRepository;
+use App\Validator\TreasuresAllowedOwnerChange;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -87,6 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: DragonTreasure::class, mappedBy: 'owner', cascade: ['persist'], orphanRemoval: true)] // "cascade: ['persist']" means that you can create a new DragonTreasure on creating/updating the user, "orphanRemoval: true" means that you can delete a new DragonTreasure on updating the user
     #[Groups(['user:read', 'user:write'])]
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /users/<id>" request
+    #[TreasuresAllowedOwnerChange] // See the App\Validator\TreasuresAllowedOwnerChangeValidator
     private Collection $dragonTreasures;
 
     /**
