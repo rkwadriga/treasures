@@ -119,4 +119,21 @@ class UserResourceTest extends ApiTestCase
             ->assertStatus(Response::HTTP_OK)
         ;
     }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testUnpublishedTreasuresTonReturned
+     */
+    public function testUnpublishedTreasuresTonReturned(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->asNotPublished()->create();
+
+        $this->browser()
+            ->actingAs(UserFactory::createOne())
+            ->get("{$this->baseUrl}/users/{$user->getId()}")
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('length("dragonTreasures")', 0)
+        ;
+    }
 }
