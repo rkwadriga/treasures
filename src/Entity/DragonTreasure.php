@@ -109,7 +109,7 @@ class DragonTreasure
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['treasure:read', 'treasure:write'])]
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank] // See the App\State\DragonTreasureSetOwnerProcessor
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /treasures/<id>" request
     #[IsValidOwner]
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_EXACT)] // Allows to filter entities by owners (Like GET /treasures?owner=/api/users/<user_id>)
