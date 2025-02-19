@@ -24,7 +24,8 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testGetCollectionOfTreasures(): void
     {
-        DragonTreasureFactory::createMany(5);
+        DragonTreasureFactory::createMany(5, ['isPublished' => true]);
+        DragonTreasureFactory::new()->withIsPublished(false)->create();
 
         $json = $this->browser()
             ->get("{$this->baseUrl}/treasures")
@@ -46,6 +47,45 @@ class DragonTreasureResourceTest extends ApiTestCase
             'shortDescription',
             'plunderedAtAgo',
         ]);
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testAdminCanSeeUnpublishedTreasures
+     */
+    public function testAdminCanSeeUnpublishedTreasures(): void
+    {
+        $admin = UserFactory::new()->asAdmin()->create();
+        DragonTreasureFactory::createMany(5, ['isPublished' => true]);
+        DragonTreasureFactory::new()->withIsPublished(false)->create();
+
+        $this->browser()
+            ->actingAs($admin)
+            ->get("{$this->baseUrl}/treasures")
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('totalItems', 6)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testCanSeeUnpublishedTreasuresWithAdminToken
+     */
+    public function testCanSeeUnpublishedTreasuresWithAdminToken(): void
+    {
+        $token = ApiTokenFactory::new()->withScopes(['ROLE_ADMIN'])->create();
+        DragonTreasureFactory::createMany(5, ['isPublished' => true]);
+        DragonTreasureFactory::new()->withIsPublished(false)->create();
+
+        $this->browser()
+            ->get("{$this->baseUrl}/treasures", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token->getToken(),
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('totalItems', 6)
+        ;
     }
 
     /**

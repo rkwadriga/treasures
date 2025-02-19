@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: DragonTreasure::class, mappedBy: 'owner', cascade: ['persist'], orphanRemoval: true)] // "cascade: ['persist']" means that you can create a new DragonTreasure on creating/updating the user, "orphanRemoval: true" means that you can delete a new DragonTreasure on updating the user
     #[Groups(['user:read', 'user:write'])]
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /users/<id>" request
-    #[TreasuresAllowedOwnerChange] // See the App\Validator\TreasuresAllowedOwnerChangeValidator
+    #[TreasuresAllowedOwnerChange] // Look for App\Validator\TreasuresAllowedOwnerChangeValidator
     private Collection $dragonTreasures;
 
     /**
@@ -105,7 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[SerializedName('password')]
     #[Assert\NotBlank(groups: ['postValidation'])] // This needed to run validation only on "POST /api/users" request
     #[Assert\Length(min: 4, max: 255, maxMessage: 'The password should be between 4 and 255 characters.')]
-    private ?string $plainPassword = null; // See the App\State\UserHashPasswordProcessor
+    private ?string $plainPassword = null; // Look for App\State\UserHashPasswordProcessor
 
     public function __construct()
     {
