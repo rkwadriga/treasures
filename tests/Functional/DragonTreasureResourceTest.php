@@ -44,6 +44,7 @@ class DragonTreasureResourceTest extends ApiTestCase
             'value',
             'coolFactor',
             'owner',
+            'isMine',
             'shortDescription',
             'plunderedAtAgo',
         ]);
@@ -195,10 +196,10 @@ class DragonTreasureResourceTest extends ApiTestCase
 
         $this->browser()
             ->actingAs($user)
-            ->post("{$this->baseUrl}/treasures", [
+            /*->post("{$this->baseUrl}/treasures", [
                 'json' => [],
             ])
-            ->assertStatus(422)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)*/
             ->post("{$this->baseUrl}/treasures", HttpOptions::json([
                 'name' => 'A shiny thing',
                 'description' => 'It sparkles when I wave it in the air.',

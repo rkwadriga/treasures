@@ -7,11 +7,13 @@ use ApiPlatform\Doctrine\Orm\Filter as Filters;
 use ApiPlatform\Metadata;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\DragonTreasureRepository;
+use App\State\DragonTreasureStateProvider;
 use App\Validator\IsValidOwner;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -47,6 +49,7 @@ use function Symfony\Component\String\u;
         'groups' => ['treasure:write'],
     ],
     paginationItemsPerPage: 10,
+    provider: DragonTreasureStateProvider::class
 )]
 #[Metadata\ApiResource( // Allows to select all treasures of specific user
     uriTemplate: '/users/{user_id}/treasures.{_format}',
@@ -114,6 +117,8 @@ class DragonTreasure
     #[IsValidOwner]
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_EXACT)] // Allows to filter entities by owners (Like GET /treasures?owner=/api/users/<user_id>)
     private ?User $owner = null;
+
+    private ?bool $isOwnedByAuthenticatedUser = null;
 
     public function __construct(?string $name = null)
     {
@@ -223,6 +228,24 @@ class DragonTreasure
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    #[Groups('treasure:read')]
+    #[SerializedName('isMine')]
+    public function getIsOwnedByAuthenticatedUser(): ?bool
+    {
+        if ($this->isOwnedByAuthenticatedUser === null) {
+            throw new LogicException('You must call setIsOwnedByAuthenticatedUser() before isOwnedByAuthenticatedUser()');
+        }
+
+        return $this->isOwnedByAuthenticatedUser;
+    }
+
+    public function setIsOwnedByAuthenticatedUser(?bool $isOwnedByAuthenticatedUser): static
+    {
+        $this->isOwnedByAuthenticatedUser = $isOwnedByAuthenticatedUser;
 
         return $this;
     }
