@@ -25,7 +25,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     public function testGetCollectionOfTreasures(): void
     {
         DragonTreasureFactory::createMany(5, ['isPublished' => true]);
-        DragonTreasureFactory::new()->withIsPublished(false)->create();
+        DragonTreasureFactory::new()->asNotPublished()->create();
 
         $json = $this->browser()
             ->get("{$this->baseUrl}/treasures")
@@ -56,7 +56,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     {
         $admin = UserFactory::new()->asAdmin()->create();
         DragonTreasureFactory::createMany(5, ['isPublished' => true]);
-        DragonTreasureFactory::new()->withIsPublished(false)->create();
+        DragonTreasureFactory::new()->asNotPublished()->create();
 
         $this->browser()
             ->actingAs($admin)
@@ -72,9 +72,9 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testCanSeeUnpublishedTreasuresWithAdminToken(): void
     {
-        $token = ApiTokenFactory::new()->withScopes(['ROLE_ADMIN'])->withExpiresAfter('1 hour')->create();
+        $token = ApiTokenFactory::new()->withScopes(['ROLE_ADMIN'])->asNotExpired()->create();
         DragonTreasureFactory::createMany(5, ['isPublished' => true]);
-        DragonTreasureFactory::new()->withIsPublished(false)->create();
+        DragonTreasureFactory::new()->asNotPublished()->create();
 
         $this->browser()
             ->get("{$this->baseUrl}/treasures", [
@@ -93,7 +93,7 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testGetOneUnpublishedTreasure404s(): void
     {
-        $treasure = DragonTreasureFactory::new()->withIsPublished(false)->create();
+        $treasure = DragonTreasureFactory::new()->asNotPublished()->create();
 
         $this->browser()
             ->get("{$this->baseUrl}/treasures/{$treasure->getId()}")
@@ -108,7 +108,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     {
         $admin = UserFactory::new()->asAdmin()->create();
         $treasure = DragonTreasureFactory::new()
-            ->withIsPublished(false)
+            ->asNotPublished()
             ->withName('Super valuable treasure')
             ->create()
         ;
@@ -127,9 +127,9 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testCanSeeSingleUnpublishedTreasureWithAdminToken(): void
     {
-        $token = ApiTokenFactory::new()->withScopes(['ROLE_ADMIN'])->withExpiresAfter('1 hour')->create();
+        $token = ApiTokenFactory::new()->withScopes(['ROLE_ADMIN'])->asNotExpired()->create();
         $treasure = DragonTreasureFactory::new()
-            ->withIsPublished(false)
+            ->asNotPublished()
             ->withName('Super valuable treasure')
             ->create()
         ;
@@ -143,6 +143,46 @@ class DragonTreasureResourceTest extends ApiTestCase
             ->assertStatus(Response::HTTP_OK)
             ->assertJson()
             ->assertJsonMatches('name', 'Super valuable treasure')
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testOwnerCanSeeUnpublishedTreasures
+     */
+    public function testOwnerCanSeeUnpublishedTreasures(): void
+    {
+        $user = UserFactory::createOne();
+        DragonTreasureFactory::createMany(5, ['isPublished' => true]);
+        DragonTreasureFactory::new()->withOwner($user)->asNotPublished()->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->get("{$this->baseUrl}/treasures")
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('totalItems', 6)
+        ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testUnpublishedTreasuresVisibleWithOwnersToken
+     */
+    public function testUnpublishedTreasuresVisibleWithOwnersToken(): void
+    {
+        $user = UserFactory::createOne();
+        $token = ApiTokenFactory::new()->withOwnedBy($user)->asNotExpired()->create();
+        DragonTreasureFactory::createMany(5, ['isPublished' => true]);
+        DragonTreasureFactory::new()->withOwner($user)->asNotPublished()->create();
+
+        $this->browser()
+            ->get("{$this->baseUrl}/treasures", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token->getToken(),
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('totalItems', 6)
         ;
     }
 
@@ -176,10 +216,7 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureWithApiToken(): void
     {
-        $token = ApiTokenFactory::new()
-            ->withExpiresAfter('1 hour')
-            ->withScopes([ApiToken::SCOPE_TREASURE_CREATE])
-            ->create();
+        $token = ApiTokenFactory::new()->asNotExpired()->withScopes([ApiToken::SCOPE_TREASURE_CREATE])->create();
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [
@@ -197,10 +234,7 @@ class DragonTreasureResourceTest extends ApiTestCase
      */
     public function testPostToCreateTreasureDeniedWithoutScope(): void
     {
-        $token = ApiTokenFactory::new()
-            ->withExpiresAfter('1 hour')
-            ->withScopes([ApiToken::SCOPE_TREASURE_EDIT])
-            ->create();
+        $token = ApiTokenFactory::new()->asNotExpired()->withScopes([ApiToken::SCOPE_TREASURE_EDIT])->create();
 
         $this->browser()
             ->post("{$this->baseUrl}/treasures", [
@@ -222,7 +256,7 @@ class DragonTreasureResourceTest extends ApiTestCase
         $treasure = DragonTreasureFactory::new()
             ->withValue(111111)
             ->withOwner($user)
-            ->withIsPublished(true)
+            ->asPublished()
             ->create()
         ;
 
@@ -261,12 +295,38 @@ class DragonTreasureResourceTest extends ApiTestCase
     }
 
     /**
+     * Run test: ./bin/phpunit --filter=testPatchUnpublishedTreasure
+     */
+    public function testPatchUnpublishedTreasure(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()
+            ->withValue(111111)
+            ->withOwner($user)
+            ->asNotPublished()
+            ->create()
+        ;
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'value' => 1234578,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('value', 1234578)
+        ;
+    }
+
+    /**
      * Run test: ./bin/phpunit --filter=testAdminCanPatchToUpdateTreasure
      */
     public function testAdminCanPatchToUpdateTreasure(): void
     {
         $admin = UserFactory::new()->asAdmin()->create();
-        $treasure = DragonTreasureFactory::new()->withValue(111111)->withIsPublished(false)->create();
+        $treasure = DragonTreasureFactory::new()->withValue(111111)->asNotPublished()->create();
 
         $this->browser()
             ->actingAs($admin)
@@ -288,7 +348,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     public function testOwnerCanSeeIsPublishedField(): void
     {
         $user = UserFactory::createOne();
-        $treasure = DragonTreasureFactory::new()->withOwner($user)->withIsPublished(true)->create();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->asPublished()->create();
 
         $this->browser()
             ->actingAs($user)
@@ -310,7 +370,7 @@ class DragonTreasureResourceTest extends ApiTestCase
     public function testImpossibleGetTreasuresCollectionWithExpiredToken(): void
     {
         $token = ApiTokenFactory::new()->asExpired()->create();
-        DragonTreasureFactory::new()->withIsPublished(true)->create();
+        DragonTreasureFactory::new()->asPublished()->create();
 
         $this->browser()
             ->get("{$this->baseUrl}/treasures", [

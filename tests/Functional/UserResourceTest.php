@@ -72,7 +72,7 @@ class UserResourceTest extends ApiTestCase
         $otherUser = UserFactory::createOne();
         $treasure = DragonTreasureFactory::new()
             ->withOwner($otherUser)
-            ->withIsPublished(true)
+            ->asPublished()
             ->create()
         ;
 

@@ -31,9 +31,18 @@ readonly class DragonTreasureIsPublishedExtension implements QueryCollectionExte
             return;
         }
 
+        $user = $this->security->getUser();
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        $queryBuilder
-            ->andWhere(sprintf('%s.isPublished = :is_published', $rootAlias))
-            ->setParameter('is_published', true);
+
+        if ($user !== null) {
+            $queryBuilder
+                ->andWhere(sprintf('%s.isPublished = :is_published OR %s.owner = :current_user', $rootAlias, $rootAlias))
+                ->setParameter('current_user', $user);
+        } else {
+            $queryBuilder
+                ->andWhere(sprintf('%s.isPublished = :is_published', $rootAlias));
+        }
+
+        $queryBuilder->setParameter('is_published', true);
     }
 }

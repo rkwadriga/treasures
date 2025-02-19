@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\ApiToken;
+use App\Entity\User;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -39,6 +40,16 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
     public function withScopes(array $scopes): ApiTokenFactory
     {
         return $this->with(['scopes' => $scopes]);
+    }
+
+    public function withOwnedBy(User $owner): ApiTokenFactory
+    {
+        return $this->with(['ownedBy' => $owner]);
+    }
+
+    public function asNotExpired(string $interval = '1 hour'): ApiTokenFactory
+    {
+        return $this->withExpiresAfter($interval);
     }
 
     public function asExpired(string $interval = '1 hour'): ApiTokenFactory
