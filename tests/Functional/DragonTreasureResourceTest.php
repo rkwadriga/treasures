@@ -196,10 +196,10 @@ class DragonTreasureResourceTest extends ApiTestCase
 
         $this->browser()
             ->actingAs($user)
-            /*->post("{$this->baseUrl}/treasures", [
+            ->post("{$this->baseUrl}/treasures", [
                 'json' => [],
             ])
-            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)*/
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->post("{$this->baseUrl}/treasures", HttpOptions::json([
                 'name' => 'A shiny thing',
                 'description' => 'It sparkles when I wave it in the air.',
