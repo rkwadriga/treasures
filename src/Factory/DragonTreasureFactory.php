@@ -29,6 +29,11 @@ final class DragonTreasureFactory extends PersistentProxyObjectFactory
         return $this->with(['isPublished' => $isPublished]);
     }
 
+    public function withName(string $name): DragonTreasureFactory
+    {
+        return $this->with(['name' => $name]);
+    }
+
     public static function class(): string
     {
         return DragonTreasure::class;

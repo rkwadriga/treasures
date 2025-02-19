@@ -23,7 +23,7 @@ use function Symfony\Component\String\u;
     description: 'A rare and valuable treasure',
     operations: [
         new Metadata\GetCollection(), // Look for App\ApiPlatform\DragonTreasureIsPublishedExtension
-        new Metadata\Get(
+        new Metadata\Get( // Look for App\ApiPlatform\DragonTreasureIsPublishedExtension
             normalizationContext: [
                 'groups' => ['treasure:read', 'treasure:item:get'],
             ],

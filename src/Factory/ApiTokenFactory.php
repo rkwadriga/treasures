@@ -18,7 +18,7 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
         return ApiToken::class;
     }
 
-    public function withExpiresAfter(string $interval, array $attributes = []): ApiTokenFactory
+    public function withExpiresAfter(string $interval): ApiTokenFactory
     {
         $date = new DateTime();
         $date->add(DateInterval::createFromDateString("+{$interval}"));
@@ -36,7 +36,7 @@ final class ApiTokenFactory extends PersistentProxyObjectFactory
         return $this->with(['expiresAt' => $expiresAt]);
     }
 
-    public function withScopes(array $scopes, array $attributes = []): ApiTokenFactory
+    public function withScopes(array $scopes): ApiTokenFactory
     {
         return $this->with(['scopes' => $scopes]);
     }
