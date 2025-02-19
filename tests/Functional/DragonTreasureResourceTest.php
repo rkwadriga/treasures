@@ -5,6 +5,7 @@ namespace App\Tests\Functional;
 use App\Entity\ApiToken;
 use App\Factory\ApiTokenFactory;
 use App\Factory\DragonTreasureFactory;
+use App\Factory\NotificationFactory;
 use App\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Zenstruck\Browser\HttpOptions;
@@ -358,7 +359,8 @@ class DragonTreasureResourceTest extends ApiTestCase
                     'value' => 54321,
                 ],
             ])
-            ->assertStatus(200)
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
             ->assertJsonMatches('value', 54321)
             ->assertJsonMatches('isPublished', true)
             ->assertJsonMatches('isMine', true)
@@ -403,5 +405,28 @@ class DragonTreasureResourceTest extends ApiTestCase
             ])
             ->assertStatus(Response::HTTP_UNAUTHORIZED)
         ;
+    }
+
+    /**
+     * Run test: ./bin/phpunit --filter=testPublishTreasure
+     */
+    public function testPublishTreasure()
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->asNotPublished()->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/treasures/{$treasure->getId()}", [
+                'json' => [
+                    'isPublished' => true,
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJson()
+            ->assertJsonMatches('isPublished', true)
+        ;
+
+        NotificationFactory::repository()->assert()->count(1);
     }
 }

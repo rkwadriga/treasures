@@ -7,6 +7,7 @@ use ApiPlatform\Doctrine\Orm\Filter as Filters;
 use ApiPlatform\Metadata;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\DragonTreasureRepository;
+use App\State\DragonTreasureStateProcessor;
 use App\State\DragonTreasureStateProvider;
 use App\Validator\IsValidOwner;
 use Carbon\Carbon;
@@ -30,14 +31,19 @@ use function Symfony\Component\String\u;
                 'groups' => ['treasure:read', 'treasure:item:get'],
             ],
         ),
-        new Metadata\Post(security: 'is_granted("ROLE_TREASURE_CREATE")'),
+        new Metadata\Post(
+            security: 'is_granted("ROLE_TREASURE_CREATE")',
+            processor: DragonTreasureStateProcessor::class
+        ),
         new Metadata\Put(
             security: 'is_granted("ROLE_ADMIN") or (is_granted("ROLE_TREASURE_EDIT") and object.getOwner() == user)',
-            securityPostDenormalize: 'is_granted("ROLE_ADMIN") or object.getOwner() == user'
+            securityPostDenormalize: 'is_granted("ROLE_ADMIN") or object.getOwner() == user',
+            processor: DragonTreasureStateProcessor::class
         ),
         new Metadata\Patch(
-            security: 'is_granted("EDIT", object)' // Look for App\Security\Voter\DragonTreasureVoter
+            security: 'is_granted("EDIT", object)', // Look for App\Security\Voter\DragonTreasureVoter
             //securityPostDenormalize: 'is_granted("EDIT", object)' // Look for App\Security\Voter\DragonTreasureVoter
+            processor: DragonTreasureStateProcessor::class
         ),
         new Metadata\Delete(security: 'is_granted("ROLE_ADMIN")'),
     ],
@@ -106,13 +112,13 @@ class DragonTreasure
     //#[Metadata\ApiProperty(security: 'is_granted("EDIT", object)')] // Look for App\Security\Voter\DragonTreasureVoter
     // Look for App\ApiPlatform\AminGroupsContextBuilder (it adds for admin the "admin:read" group on serializing and "admin:write" group on deserializing)
     // Look for App\Normalizer\AddOwnerGroupNormalizer (it adds the "owner:read" group for the Treasure's owner)
-    #[Groups(['admin:read', 'admin:write', 'owner:read'])]
+    #[Groups(['admin:read', 'admin:write', 'owner:read', 'treasure:write'])]
     private bool $isPublished;
 
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['treasure:read', 'treasure:write'])]
-    // #[Assert\NotBlank] // Look for App\State\DragonTreasureSetOwnerProcessor
+    // #[Assert\NotBlank] // Look for App\State\DragonTreasureStateProcessor
     #[Assert\Valid] // It's needed for use User validation on updating user in request "PATCH /treasures/<id>" request
     #[IsValidOwner]
     #[Metadata\ApiFilter(Filters\SearchFilter::class, strategy: SearchFilterInterface::STRATEGY_EXACT)] // Allows to filter entities by owners (Like GET /treasures?owner=/api/users/<user_id>)
