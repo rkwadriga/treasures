@@ -2,7 +2,6 @@
 
 namespace App\ApiResource;
 
-use AllowDynamicProperties;
 use ApiPlatform\Metadata;
 use App\Enum\DailyQuestStatusEnum;
 use App\State\DailyQuestStateProcessor;
@@ -19,6 +18,7 @@ use Symfony\Component\Serializer\Annotation;
             processor: DailyQuestStateProcessor::class // It's normal to move processor tp the ApiResource config because the GET requests never call processors
         )
     ],
+    paginationItemsPerPage: 10,
     provider: DailyQuestStateProvider::class
 )]
 class DailyQuest
@@ -35,6 +35,15 @@ class DailyQuest
     public DailyQuestStatusEnum $status;
 
     public DateTimeInterface $lastUpdated;
+
+    /*
+     * @var DragonTreasure[] // It's required to help ApiPlatform understand that this is a related property and run App\State\DragonTreasureStateProcessor to process the entities
+     */
+    /**
+     * @var QuestTreasure[]
+     */
+    #[Metadata\ApiProperty(genId: false)] // genId: false needed to avoid generation the fake IDs for QuestTreasure entities in responses
+    public array $treasures;
 
     public function __construct(DateTimeInterface $day)
     {

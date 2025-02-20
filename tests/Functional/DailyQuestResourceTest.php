@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Enum\DailyQuestStatusEnum;
+use App\Factory\DragonTreasureFactory;
 use DateTime;
 use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,8 @@ class DailyQuestResourceTest extends ApiTestCase
      */
     public function testPatchCanUpdateStatus(): void
     {
+        DragonTreasureFactory::createMany(5);
+
         $this->browser()
             ->patch($this->getUrl('-2 days'), [
                 'json' => [
