@@ -11,7 +11,6 @@ use App\ApiResource\UserApi;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityNotFoundException;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
