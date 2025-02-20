@@ -2,14 +2,23 @@
 
 namespace App\ApiResource;
 
+use AllowDynamicProperties;
 use ApiPlatform\Metadata;
 use App\Enum\DailyQuestStatusEnum;
+use App\State\DailyQuestStateProcessor;
 use App\State\DailyQuestStateProvider;
 use DateTimeInterface;
 use Symfony\Component\Serializer\Annotation;
 
 #[Metadata\ApiResource(
     shortName: 'Quest',
+    operations: [
+        new Metadata\GetCollection(),
+        new Metadata\Get(),
+        new Metadata\Patch(
+            processor: DailyQuestStateProcessor::class // It's normal to move processor tp the ApiResource config because the GET requests never call processors
+        )
+    ],
     provider: DailyQuestStateProvider::class
 )]
 class DailyQuest
@@ -24,6 +33,8 @@ class DailyQuest
     public int $difficulty;
 
     public DailyQuestStatusEnum $status;
+
+    public DateTimeInterface $lastUpdated;
 
     public function __construct(DateTimeInterface $day)
     {
