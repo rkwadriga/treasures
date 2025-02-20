@@ -24,9 +24,11 @@ use App\State\EntityToDtoStateProvider;
 class UserApi
 {
     public function __construct(
+        #[Metadata\ApiProperty(readable: false, identifier: true)]
         public ?int $id = null,
         public ?string $email = null,
         public ?string $username = null,
+        #[Metadata\ApiProperty(readable: false)]
         public ?string $password = null,
         public ?int $flameThrowingDistance = null,
         /**

@@ -59,7 +59,6 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
         ;
         if ($dto->password !== null) {
             $entity->setPassword($this->passwordHasher->hashPassword($entity, $dto->password));
-            $dto->password = null;
         }
 
         return $entity;
