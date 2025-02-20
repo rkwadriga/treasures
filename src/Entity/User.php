@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column]
-    public array $roles;
+    public array $roles = [];
 
     #[ORM\Column]
     private ?string $password = null;
@@ -135,7 +135,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        if ($this->accessTokenScopes === null) {
+        if (!isset($this->accessTokenScopes)) {
             // Logged in as a full, normal user
             $roles = $this->roles;
             $roles[] = 'ROLE_FULL_USER';

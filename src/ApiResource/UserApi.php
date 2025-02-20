@@ -8,12 +8,14 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata;
 use App\Entity\DragonTreasure;
 use App\Entity\User;
+use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityToDtoStateProvider;
 
 #[Metadata\ApiResource(
     shortName: 'User',
     paginationItemsPerPage: 5,
-    provider: EntityToDtoStateProvider::class, // This provider converts ORM-entities to DTO-objects
+    provider: EntityToDtoStateProvider::class, // This provider converts ORM-entities to DTO-objects (For GET requests)
+    processor: EntityClassDtoStateProcessor::class, // This processor converts DTO-objects to ORM-entities (For POST, PUT, PATCH and DELETE requests)
     stateOptions: new Options(entityClass: User::class)
 )]
 #[Metadata\ApiFilter(SearchFilter::class, properties: [
@@ -25,6 +27,7 @@ class UserApi
         public ?int $id = null,
         public ?string $email = null,
         public ?string $username = null,
+        public ?string $password = null,
         public ?int $flameThrowingDistance = null,
         /**
          * @var DragonTreasure[]
