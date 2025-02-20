@@ -10,22 +10,27 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\UserApi;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityNotFoundException;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class EntityClassDtoStateProcessor implements ProcessorInterface
+readonly class EntityClassDtoStateProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly UserRepository $userRepository,
-        #[Autowire(service: PersistProcessor::class)] private readonly ProcessorInterface $persistProcessor,
-        #[Autowire(service: RemoveProcessor::class)] private readonly ProcessorInterface $removeProcessor,
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private UserRepository                                                   $userRepository,
+        #[Autowire(service: PersistProcessor::class)] private ProcessorInterface $persistProcessor,
+        #[Autowire(service: RemoveProcessor::class)] private ProcessorInterface  $removeProcessor,
+        private UserPasswordHasherInterface                                      $passwordHasher,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         assert($data instanceof UserApi);
+        if (isset($uriVariables['id']) && $uriVariables['id'] !== $data->id) {
+            throw new UnprocessableEntityHttpException('You cannot change the id of this entity.');
+        }
 
         $entity = $this->mapDtoToEntity($data);
 
@@ -47,7 +52,7 @@ class EntityClassDtoStateProcessor implements ProcessorInterface
         if ($dto->id !== null) {
             $entity = $this->userRepository->find($dto->id);
             if ($entity === null) {
-                throw new Exception("Entity #{$dto->id} not found");
+                throw new EntityNotFoundException("Entity #{$dto->id} not found");
             }
         } else {
             $entity = new User();

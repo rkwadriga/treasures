@@ -13,6 +13,8 @@ use App\State\EntityToDtoStateProvider;
 
 #[Metadata\ApiResource(
     shortName: 'User',
+    //normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['flameThrowingDistance']], // Do not show selected fields in responses
+    //denormalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['flameThrowingDistance']], // Do not write selected attributes values from request input
     paginationItemsPerPage: 5,
     provider: EntityToDtoStateProvider::class, // This provider converts ORM-entities to DTO-objects (For GET requests)
     processor: EntityClassDtoStateProcessor::class, // This processor converts DTO-objects to ORM-entities (For POST, PUT, PATCH and DELETE requests)
@@ -24,7 +26,7 @@ use App\State\EntityToDtoStateProvider;
 class UserApi
 {
     public function __construct(
-        #[Metadata\ApiProperty(readable: false, identifier: true)]
+        #[Metadata\ApiProperty(readable: false, writable: false, identifier: true)]
         public ?int $id = null,
         public ?string $email = null,
         public ?string $username = null,
