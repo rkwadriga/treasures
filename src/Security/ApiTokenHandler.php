@@ -9,10 +9,10 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
-class ApiTokenHandler implements AccessTokenHandlerInterface
+readonly class ApiTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
-        private readonly ApiTokenRepository $tokenRepository,
+        private ApiTokenRepository $tokenRepository,
     ) {
     }
 
@@ -27,7 +27,7 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
         }
 
         // Set user's roles to be defined by token's scopes
-        $token->getOwnedBy()->markAsTokenAuthenticated($token->getScopes());
+        $token->getOwnedBy()->setAccessTokenScopes($token->getScopes());
 
         return new UserBadge($token->getOwnedBy()->getUserIdentifier());
     }
