@@ -32,10 +32,12 @@ class UserApi
         public ?string $username = null,
         #[Metadata\ApiProperty(readable: false)]
         public ?string $password = null,
+        #[Metadata\ApiProperty(writable: false)]
         public ?int $flameThrowingDistance = null,
         /**
          * @var DragonTreasure[]
          */
+        #[Metadata\ApiProperty(writable: false)]
         public array $dragonTreasures = [],
     ) {
     }
