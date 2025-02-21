@@ -4,11 +4,12 @@ namespace App\State;
 
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\UserApi;
-use App\Entity\User;
+use LogicException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -23,12 +24,18 @@ readonly class EntityClassDtoStateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+        $stateOptions = $operation->getStateOptions();
+        $resourceClass = $stateOptions instanceof Options ? $stateOptions->getEntityClass() : null;
+        if ($resourceClass === null) {
+            throw new LogicException(sprintf('You must set the stateOptions.entityClass for resource %s', $data::class));
+        }
+
         assert($data instanceof UserApi);
         if (isset($uriVariables['id']) && $uriVariables['id'] !== $data->id) {
             throw new UnprocessableEntityHttpException('You cannot change the id of this entity.');
         }
 
-        $entity = $this->mapDtoToEntity($data);
+        $entity = $this->mapDtoToEntity($data, $resourceClass);
 
         if ($operation instanceof DeleteOperationInterface) {
             return $this->removeProcessor->process($entity, $operation, $uriVariables, $context);
@@ -42,8 +49,8 @@ readonly class EntityClassDtoStateProcessor implements ProcessorInterface
         return $data;
     }
 
-    private function mapDtoToEntity(object $dto): object
+    private function mapDtoToEntity(object $dto, string $resourceClass): object
     {
-        return $this->microMapper->map($dto, User::class);
+        return $this->microMapper->map($dto, $resourceClass);
     }
 }

@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\UserApi;
 use ArrayIterator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -25,13 +24,14 @@ readonly class EntityToDtoStateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        $resourceClass = $operation->getClass();
         if ($operation instanceof CollectionOperationInterface) {
             $entities = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($entities instanceof Paginator);
 
             $dtos = [];
             foreach ($entities as $entity) {
-                $dtos[] = $this->entityToDto($entity);
+                $dtos[] = $this->entityToDto($entity, $resourceClass);
             }
 
             return new TraversablePaginator(
@@ -43,11 +43,11 @@ readonly class EntityToDtoStateProvider implements ProviderInterface
         }
 
         $entity = $this->itenProvider->provide($operation, $uriVariables, $context);
-        return $entity !== null ? $this->entityToDto($entity) : null;
+        return $entity !== null ? $this->entityToDto($entity, $resourceClass) : null;
     }
 
-    private function entityToDto(object $entity): object
+    private function entityToDto(object $entity, string $resourceClass): object
     {
-        return $this->microMapper->map($entity, UserApi::class);
+        return $this->microMapper->map($entity, $resourceClass);
     }
 }
