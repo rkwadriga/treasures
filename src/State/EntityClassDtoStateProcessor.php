@@ -9,19 +9,16 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\UserApi;
 use App\Entity\User;
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 readonly class EntityClassDtoStateProcessor implements ProcessorInterface
 {
     public function __construct(
-        private UserRepository                                                   $userRepository,
         #[Autowire(service: PersistProcessor::class)] private ProcessorInterface $persistProcessor,
         #[Autowire(service: RemoveProcessor::class)] private ProcessorInterface  $removeProcessor,
-        private UserPasswordHasherInterface                                      $passwordHasher,
+        private MicroMapperInterface                                             $microMapper,
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
@@ -47,24 +44,6 @@ readonly class EntityClassDtoStateProcessor implements ProcessorInterface
 
     private function mapDtoToEntity(object $dto): object
     {
-        assert($dto instanceof UserApi);
-        if ($dto->id !== null) {
-            $entity = $this->userRepository->find($dto->id);
-            if ($entity === null) {
-                throw new EntityNotFoundException("Entity #{$dto->id} not found");
-            }
-        } else {
-            $entity = new User();
-        }
-
-        $entity
-            ->setEmail($dto->email)
-            ->setUsername($dto->username)
-        ;
-        if ($dto->password !== null) {
-            $entity->setPassword($this->passwordHasher->hashPassword($entity, $dto->password));
-        }
-
-        return $entity;
+        return $this->microMapper->map($dto, User::class);
     }
 }
