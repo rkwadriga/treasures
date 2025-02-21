@@ -47,14 +47,15 @@ readonly class EntityToDtoStateProvider implements ProviderInterface
 
     private function entityToDto(object $entity): object
     {
-        /** @var User $entity */
-        return new UserApi(
-            $entity->getId(),
-            $entity->getUsername(),
-            $entity->getEmail(),
-            null,
-            rand(0, 10),
-            $entity->getPublishedDragonTreasures()->toArray(),
-        );
+        assert($entity instanceof User);
+
+        $dto = new UserApi();
+        $dto->id = $entity->getId();
+        $dto->email = $entity->getEmail();
+        $dto->username = $entity->getUsername();
+        $dto->flameThrowingDistance = rand(0, 10);
+        $dto->dragonTreasures = $entity->getPublishedDragonTreasures()->toArray();
+
+        return $dto;
     }
 }
