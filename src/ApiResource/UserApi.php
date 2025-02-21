@@ -6,7 +6,6 @@ use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata;
-use ApiPlatform\Metadata\GetCollection;
 use App\Entity\DragonTreasure;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
@@ -17,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'User',
     operations: [
         new Metadata\Get(),
-        new GetCollection(),
+        new Metadata\GetCollection(),
         new Metadata\Post(
             security: 'is_granted("PUBLIC_ACCESS")',
             validationContext: ['groups' => ['Default', 'PostValidation']],

@@ -44,10 +44,10 @@ class DragonTreasureResourceTest extends ApiTestCase
             'description',
             'value',
             'coolFactor',
-            'owner',
-            'isMine',
             'shortDescription',
             'plunderedAtAgo',
+            'isMine',
+            'owner',
         ]);
     }
 
