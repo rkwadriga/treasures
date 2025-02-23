@@ -6,7 +6,6 @@ use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata;
-use App\Entity\DragonTreasure;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityToDtoStateProvider;
@@ -29,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     //normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['flameThrowingDistance']], // Do not show selected fields in responses
     //denormalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['flameThrowingDistance']], // Do not write selected attributes values from request input
     paginationItemsPerPage: 5,
-    security: 'is_granted("ROLE_USER")',
+    //security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class, // This provider converts ORM-entities to DTO-objects (For GET requests)
     processor: EntityClassDtoStateProcessor::class, // This processor converts DTO-objects to ORM-entities (For POST, PUT, PATCH and DELETE requests)
     stateOptions: new Options(entityClass: User::class)
@@ -58,7 +57,7 @@ class UserApi
     public ?int $flameThrowingDistance = null;
 
     /**
-     * @var DragonTreasure[]
+     * @var DragonTreasureApi[]
      */
     #[Metadata\ApiProperty(writable: false)]
     public array $dragonTreasures = [];
