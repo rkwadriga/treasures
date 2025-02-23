@@ -21,10 +21,10 @@ abstract class ApiTestCase extends KernelTestCase
 
     protected function browser(array $options = [], array $server = []): KernelBrowser
     {
-        return $this->baseKernelBrowser($options, $server)
-            ->setDefaultHttpOptions(
-                HttpOptions::create()->withHeader('Accept', 'application/ld+json')
-            );
+        $_SERVER['KERNEL_BROWSER_CLASS'] = ApiTestBrowser::class;
+        return $this->baseKernelBrowser($options, $server)->setDefaultHttpOptions(HttpOptions::create()->withHeaders([
+            'Accept' => 'application/json',
+        ]));
     }
 
     protected function getEntityManager(): EntityManagerInterface

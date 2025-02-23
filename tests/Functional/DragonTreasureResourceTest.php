@@ -270,7 +270,6 @@ class DragonTreasureResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(Response::HTTP_OK)
-            ->assertJson()
             ->assertJsonMatches('value', 1234578)
         ;
 

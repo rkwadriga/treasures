@@ -44,7 +44,7 @@ readonly class DragonTreasureEntityToApiMapper implements MapperInterface
         $dto->plunderedAtAgo = $entity->getPlunderedAtAgo();
         $dto->isMine = $this->security->getUser() && $this->security->getUser() === $entity->getOwner();
         $dto->owner = $entity->getOwner() !== null ? $this->mapper->map($entity->getOwner(), UserApi::class, [
-            MicroMapperInterface::MAX_DEPTH => 0,
+            MicroMapperInterface::MAX_DEPTH => 1,
         ]) : null;
 
         return $dto;

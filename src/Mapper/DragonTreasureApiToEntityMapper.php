@@ -43,11 +43,9 @@ readonly class DragonTreasureApiToEntityMapper implements MapperInterface
         assert($dto instanceof DragonTreasureApi);
         assert($entity instanceof DragonTreasure);
 
-        $entity
-            ->setTextDescription($dto->description)
-            ->setValue($dto->value)
-            ->setCoolFactor($dto->coolFactor)
-        ;
+        $entity->setTextDescription($dto->description);
+        $entity->setValue($dto->value);
+        $entity->setCoolFactor($dto->coolFactor);
         if ($dto->owner !== null) {
             $entity->setOwner($this->mapper->map($dto->owner, User::class));
         } elseif ($this->security->getUser() !== null) {

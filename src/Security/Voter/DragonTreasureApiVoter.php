@@ -2,14 +2,14 @@
 
 namespace App\Security\Voter;
 
+use App\ApiResource\DragonTreasureApi;
 use App\Entity\ApiToken;
-use App\Entity\DragonTreasure;
+use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 
-final class DragonTreasureVoter extends Voter
+final class DragonTreasureApiVoter extends Voter
 {
     public const string EDIT = 'EDIT';
 
@@ -20,26 +20,26 @@ final class DragonTreasureVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === self::EDIT && $subject instanceof DragonTreasure;
+        return $attribute === self::EDIT && $subject instanceof DragonTreasureApi;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
-        if (!$user instanceof UserInterface) {
+        if (!$user instanceof User) {
             return false;
         }
 
-        assert($subject instanceof DragonTreasure);
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
+        assert($subject instanceof DragonTreasureApi);
 
         if (!$this->security->isGranted(ApiToken::SCOPE_TREASURE_EDIT)) {
             return false;
         }
 
-        if ($subject->getOwner() === $user || $this->security->isGranted('ROLE_ADMIN')) {
-            return true;
-        }
-
-        return false;
+        return $subject->owner?->id === $user->getId();
     }
 }
