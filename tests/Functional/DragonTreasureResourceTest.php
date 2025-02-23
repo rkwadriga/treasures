@@ -189,9 +189,9 @@ class DragonTreasureResourceTest extends ApiTestCase
     }
 
     /**
-     * Run test: ./bin/phpunit --filter=testPostToCreateTreasure
+     * Run test: ./bin/phpunit --filter=testPostToCreateNewTreasure
      */
-    public function testPostToCreateTreasure(): void
+    public function testPostToCreateNewTreasure(): void
     {
         $user = UserFactory::createOne();
 

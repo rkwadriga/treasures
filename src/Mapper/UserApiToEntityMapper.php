@@ -25,7 +25,7 @@ readonly class UserApiToEntityMapper implements MapperInterface
 
         $entity = $dto->id !== null ? $this->userRepository->find($dto->id) : new User();
         if ($entity === null) {
-            throw new EntityNotFoundException("User {$dto->id} not found");
+            throw new EntityNotFoundException(sprintf('Entity %s #%s not found', User::class, $dto->id));
         }
 
         return $entity;
