@@ -56,6 +56,9 @@ class DragonTreasureApi
 
     public ?bool $isMine = null;
 
+    #[Metadata\ApiProperty(security: 'object === null or is_granted("EDIT", object)')] // Look for the App\Security\Voter\DragonTreasureApiVoter
+    public bool $isPublished = false;
+
     #[IsValidOwner]
     public ?UserApi $owner = null;
 }

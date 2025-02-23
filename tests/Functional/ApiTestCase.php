@@ -23,7 +23,7 @@ abstract class ApiTestCase extends KernelTestCase
     {
         $_SERVER['KERNEL_BROWSER_CLASS'] = ApiTestBrowser::class;
         return $this->baseKernelBrowser($options, $server)->setDefaultHttpOptions(HttpOptions::create()->withHeaders([
-            'Accept' => 'application/json',
+            'Accept' => 'application/ld+json',
         ]));
     }
 
