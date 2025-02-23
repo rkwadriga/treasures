@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+// Look at the App\State\DragonTreasureStateProcessor - it creates a new Notification on publishing the Treasure resource
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification
 {

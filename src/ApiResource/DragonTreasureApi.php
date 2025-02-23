@@ -5,7 +5,7 @@ namespace App\ApiResource;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata;
 use App\Entity\DragonTreasure;
-use App\State\EntityClassDtoStateProcessor;
+use App\State\DragonTreasureStateProcessor;
 use App\State\EntityToDtoStateProvider;
 use App\Validator\IsValidOwner;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,8 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Metadata\ApiResource(
     shortName: 'Treasure',
     operations: [
-        new Metadata\Get(),
-        new Metadata\GetCollection(),
+        new Metadata\Get(), // Look at the App\ApiPlatform\DragonTreasureIsPublishedExtension - it shows unpublished treasures only for admin and the owner
+        new Metadata\GetCollection(), // Look at the App\ApiPlatform\DragonTreasureIsPublishedExtension - it shows unpublished treasures only for admin and the owner
         new Metadata\Post(
             security: 'is_granted("ROLE_TREASURE_CREATE")',
             validationContext: ['groups' => ['Default', 'PostValidation']],
@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     paginationItemsPerPage: 10,
     provider: EntityToDtoStateProvider::class, // This provider converts ORM-entities to DTO-objects (For GET requests)
-    processor: EntityClassDtoStateProcessor::class, // This processor converts DTO-objects to ORM-entities (For POST, PUT, PATCH and DELETE requests)
+    processor: DragonTreasureStateProcessor::class, // This processor converts DTO-objects to ORM-entities (For POST, PUT, PATCH and DELETE requests)
     stateOptions: new Options(entityClass: DragonTreasure::class)
 )]
 class DragonTreasureApi
