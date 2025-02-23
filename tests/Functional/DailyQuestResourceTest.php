@@ -30,9 +30,6 @@ class DailyQuestResourceTest extends ApiTestCase
                 'json' => [
                     'status' => DailyQuestStatusEnum::COMPLETED,
                 ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                ]
             ])
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonMatches('status', DailyQuestStatusEnum::COMPLETED->value)

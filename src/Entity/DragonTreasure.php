@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use LogicException;
 use function Symfony\Component\String\u;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
@@ -39,8 +38,6 @@ class DragonTreasure
     #[ORM\ManyToOne(inversedBy: 'dragonTreasures')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
-
-    private ?bool $isOwnedByAuthenticatedUser = null;
 
     public function __construct(?string $name = null)
     {
@@ -144,22 +141,6 @@ class DragonTreasure
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
-
-        return $this;
-    }
-
-    public function getIsOwnedByAuthenticatedUser(): ?bool
-    {
-        if ($this->isOwnedByAuthenticatedUser === null) {
-            throw new LogicException('You must call setIsOwnedByAuthenticatedUser() before isOwnedByAuthenticatedUser()');
-        }
-
-        return $this->isOwnedByAuthenticatedUser;
-    }
-
-    public function setIsOwnedByAuthenticatedUser(?bool $isOwnedByAuthenticatedUser): static
-    {
-        $this->isOwnedByAuthenticatedUser = $isOwnedByAuthenticatedUser;
 
         return $this;
     }

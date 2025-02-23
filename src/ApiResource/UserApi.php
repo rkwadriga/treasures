@@ -59,6 +59,6 @@ class UserApi
     /**
      * @var DragonTreasureApi[]
      */
-    #[Metadata\ApiProperty(writable: false)]
+    //#[Metadata\ApiProperty(writable: false)]
     public array $dragonTreasures = [];
 }

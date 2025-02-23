@@ -17,7 +17,7 @@ readonly class EntityToDtoStateProvider implements ProviderInterface
 {
     public function __construct(
         #[Autowire(service: CollectionProvider::class)] private ProviderInterface $collectionProvider,
-        #[Autowire(service: ItemProvider::class)] private ProviderInterface       $itenProvider,
+        #[Autowire(service: ItemProvider::class)] private ProviderInterface       $itemProvider,
         private MicroMapperInterface                                              $microMapper,
     ) {
     }
@@ -42,7 +42,7 @@ readonly class EntityToDtoStateProvider implements ProviderInterface
             );
         }
 
-        $entity = $this->itenProvider->provide($operation, $uriVariables, $context);
+        $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
         return $entity !== null ? $this->entityToDto($entity, $resourceClass) : null;
     }
 

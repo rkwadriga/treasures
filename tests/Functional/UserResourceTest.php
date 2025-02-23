@@ -58,9 +58,6 @@ class UserResourceTest extends ApiTestCase
                 'json' => [
                     'username' => 'changed_username',
                 ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                ]
             ])
             ->assertStatus(Response::HTTP_OK)
             ->assertJson()
@@ -75,26 +72,41 @@ class UserResourceTest extends ApiTestCase
     {
         $user = UserFactory::createOne();
         $otherUser = UserFactory::createOne();
-        $treasure = DragonTreasureFactory::new()
-            ->withOwner($otherUser)
-            ->asPublished()
-            ->create()
-        ;
+        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->create();
 
         $this->browser()
             ->actingAs($user)
             ->patch("{$this->baseUrl}/users/{$user->getId()}", [
                 'json' => [
-                    'username' => 'changed_username',
                     'dragonTreasures' => [
                         "{$this->baseUrl}/treasures/{$treasure->getId()}"
                     ],
                 ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                ]
             ])
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ;
+    }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testTreasureCanBeRemoved
+     */
+    public function testTreasureCanBeRemoved(): void
+    {
+        $user = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($user)->create();
+        DragonTreasureFactory::new()->withOwner($user)->create();
+        $treasureUrl = "{$this->baseUrl}/treasures/{$treasure->getId()}";
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/users/{$user->getId()}", [
+                'json' => [
+                    'dragonTreasures' => [$treasureUrl],
+                ],
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonMatches('length("dragonTreasures")', 1)
+            ->assertJsonMatches('dragonTreasures[0]', $treasureUrl)
         ;
     }
 
@@ -117,9 +129,6 @@ class UserResourceTest extends ApiTestCase
                         "{$this->baseUrl}/treasures/{$treasure->getId()}"
                     ],
                 ],
-                'headers' => [
-                    'Content-Type' => 'application/merge-patch+json',
-                ]
             ])
             ->assertStatus(Response::HTTP_OK)
         ;
