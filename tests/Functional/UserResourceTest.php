@@ -105,7 +105,7 @@ class UserResourceTest extends ApiTestCase
                     ],
                 ],
             ])
-            ->assertStatus(Response::HTTP_BAD_REQUEST)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
         ;
     }
 

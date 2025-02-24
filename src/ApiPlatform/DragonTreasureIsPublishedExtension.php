@@ -22,7 +22,11 @@ readonly class DragonTreasureIsPublishedExtension implements QueryCollectionExte
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?Operation $operation = null, array $context = []): void
     {
-        $this->addIsPublishedEqualsTrueConditionToQuery($resourceClass, $queryBuilder);
+        // Filter DragonTreasure only for direct HTTP requests (like GET|PUT|DELETE /api/treasures/<id>)
+        //  and do not filter it when it converts from uri-strings in requests POST|PUT /api/users/<id>
+        if (isset($context['request'])) {
+            $this->addIsPublishedEqualsTrueConditionToQuery($resourceClass, $queryBuilder);
+        }
     }
 
     public function addIsPublishedEqualsTrueConditionToQuery(string $resourceClass, QueryBuilder $queryBuilder): void
