@@ -9,6 +9,7 @@ use ApiPlatform\Metadata;
 use App\Entity\User;
 use App\State\EntityClassDtoStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use App\Validator\TreasuresAllowedOwnerChange;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Metadata\ApiResource(
@@ -36,6 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Metadata\ApiFilter(SearchFilter::class, properties: [
     'username' => SearchFilterInterface::STRATEGY_PARTIAL,
 ])]
+#[TreasuresAllowedOwnerChange]
 class UserApi
 {
     #[Metadata\ApiProperty(readable: false, writable: false, identifier: true)]
@@ -59,6 +61,5 @@ class UserApi
     /**
      * @var DragonTreasureApi[]
      */
-    //#[Metadata\ApiProperty(writable: false)]
-    public array $dragonTreasures = [];
+    public array $dragonTreasures = []; // Look at the App\Validator\TreasuresAllowedOwnerChangeValidator
 }

@@ -4,7 +4,7 @@ namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class TreasuresAllowedOwnerChange extends Constraint
 {
     public string $message = 'You cannot change the ownership of treasures';
@@ -17,5 +17,10 @@ final class TreasuresAllowedOwnerChange extends Constraint
         mixed $payload = null
     ) {
         parent::__construct([], $groups, $payload);
+    }
+
+    public function getTargets(): string|array
+    {
+        return self::CLASS_CONSTRAINT;
     }
 }
