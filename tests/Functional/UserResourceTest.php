@@ -72,7 +72,7 @@ class UserResourceTest extends ApiTestCase
     {
         $user = UserFactory::createOne();
         $otherUser = UserFactory::createOne();
-        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->create();
+        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->asPublished()->create();
 
         $this->browser()
             ->actingAs($user)
@@ -84,6 +84,28 @@ class UserResourceTest extends ApiTestCase
                 ],
             ])
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+        ;
+    }
+
+    /**
+     * Run tests: ./bin/phpunit --filter=testUnpublishedTreasureCanNotBeStolen
+     */
+    public function testUnpublishedTreasureCanNotBeStolen(): void
+    {
+        $user = UserFactory::createOne();
+        $otherUser = UserFactory::createOne();
+        $treasure = DragonTreasureFactory::new()->withOwner($otherUser)->asNotPublished()->create();
+
+        $this->browser()
+            ->actingAs($user)
+            ->patch("{$this->baseUrl}/users/{$user->getId()}", [
+                'json' => [
+                    'dragonTreasures' => [
+                        "{$this->baseUrl}/treasures/{$treasure->getId()}"
+                    ],
+                ],
+            ])
+            ->assertStatus(Response::HTTP_BAD_REQUEST)
         ;
     }
 
@@ -137,7 +159,7 @@ class UserResourceTest extends ApiTestCase
     /**
      * Run tests: ./bin/phpunit --filter=testUnpublishedTreasuresTonReturned
      */
-    public function testUnpublishedTreasuresTonReturned(): void
+    public function testUnpublishedTreasuresNotReturned(): void
     {
         $user = UserFactory::createOne();
         $treasure = DragonTreasureFactory::new()->withOwner($user)->asNotPublished()->create();
